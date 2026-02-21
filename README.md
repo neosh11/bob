@@ -53,6 +53,27 @@ npm run dev
 - Web UI: `http://localhost:5173`
 - API: `http://localhost:4000`
 
+## PWA + iPhone Install
+
+The web app now ships with:
+
+- Web App Manifest (`manifest.webmanifest`)
+- Service Worker (`sw.js`) via `vite-plugin-pwa`
+- iOS install metadata (`apple-touch-icon`, standalone meta tags)
+
+### Install on iPhone
+
+1. Open Safari and navigate to Bob (for example `http://100.x.x.x:5173`).
+2. Tap the Share button.
+3. Tap `Add to Home Screen`.
+4. Confirm the name and tap `Add`.
+
+### Important secure-context note
+
+- Service workers require a secure context (`https://`), except `localhost`.
+- On plain `http://` LAN IPs, the app can still be added to home screen, but offline caching/background SW behavior is limited.
+- For full PWA behavior on iPhone over network, serve the frontend over HTTPS (local cert reverse proxy/tunnel).
+
 ## Session Backend Setup
 
 By default, Bob runs with `codex app-server` session backend.

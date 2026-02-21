@@ -28,6 +28,9 @@ Source: npm registry + npm downloads API
 | p-queue | 8.1.1 selected, 9.1.0 latest | 16,784,024 |
 | pino | 10.3.1 | 21,266,580 |
 | pino-http | 11.0.0 | 2,285,155 |
+| vite-plugin-pwa | 1.2.0 latest, 0.20.5 selected | 1,706,286 |
+| react-markdown | 10.1.0 | 11,348,597 |
+| remark-gfm | 4.0.1 | 11,952,454 |
 | typescript | 5.9.3 | 116,834,367 |
 
 ## Notes
@@ -42,6 +45,8 @@ Source: npm registry + npm downloads API
 - `express-rate-limit` added for baseline API and auth endpoint abuse protection with minimal operational overhead.
 - `p-queue` added to enforce bounded run concurrency and prevent unbounded agent process fan-out.
 - `pino` + `pino-http` added for structured request logging with low-overhead JSON logs and built-in serializer support.
+- `vite-plugin-pwa` selected as the mainstream Vite-native PWA integration for manifest generation and service worker precache with minimal custom plumbing.
+- `react-markdown` + `remark-gfm` selected to render assistant/system markdown safely (CommonMark + GFM tables/lists/checklists) without writing a custom parser.
 
 ## Security Design References
 
@@ -71,4 +76,7 @@ curl -s "https://registry.npmjs.org/<package>/latest"
 - [p-queue](https://www.npmjs.com/package/p-queue)
 - [pino](https://www.npmjs.com/package/pino)
 - [pino-http](https://www.npmjs.com/package/pino-http)
+- [vite-plugin-pwa](https://www.npmjs.com/package/vite-plugin-pwa)
+- [react-markdown](https://www.npmjs.com/package/react-markdown)
+- [remark-gfm](https://www.npmjs.com/package/remark-gfm)
 - [typescript](https://www.npmjs.com/package/typescript)

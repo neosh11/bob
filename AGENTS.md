@@ -19,6 +19,7 @@
 - Keep command placeholder interpolation shell-safe by passing runtime values through environment indirection (avoid direct prompt injection into shell command strings).
 - In app-server mode, handle stale local sessions gracefully (thread missing/not loaded/not materialized) so they can still be inspected and deleted.
 - In app-server mode, preserve first-class lifecycle semantics: initialize handshake, thread start/resume/fork, turn start/steer/interrupt, and realtime item/turn events.
+- In app-server mode, always send sandbox policy on `turn/start` (not only `thread/start`) so resumed threads keep the configured access level after server/app-server restarts.
 - Graceful shutdown must aggressively close HTTP, websocket, and child app-server resources so dev restarts do not leave `:4000` occupied.
 
 ## Security and Access
@@ -69,6 +70,12 @@ Manual checks are required for:
 - Keep query keys centralized under each feature.
 - Realtime event handling should update query cache via pure helpers.
 - Maintain mobile-safe layouts and avoid fixed-width overflow.
+- Keep the mobile session header as two rows: row 1 for title/actions, row 2 for workspace path with horizontal scrolling for long paths.
+- Represent run status in the header with compact dot indicators (no text pills): pulsing green for running, solid green for done, with distinct colors for queued/failed.
+- Keep assistant responses expanded by default. System/reasoning entries may be toggleable, but should render as flat gray rows with button-only toggles (no collapsed preview cards).
+- Keep PWA assets coherent (`manifest`, icons, SW registration) and validate iOS install behavior after changes.
+- Remember service workers require secure context; do not assume full offline behavior on plain LAN HTTP origins.
+- Render assistant/system rich text via markdown-safe components instead of raw HTML injection.
 
 ## Dependency Policy
 

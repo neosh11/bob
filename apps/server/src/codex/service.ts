@@ -226,6 +226,7 @@ export class CodexService {
       model: process.env.BOB_CODEX_MODEL ?? this.options.config.codexModel,
       effort: process.env.BOB_CODEX_REASONING_EFFORT ?? this.options.config.codexReasoningEffort,
       approvalPolicy: this.options.config.codexApprovalPolicy,
+      sandbox: this.options.config.codexSandboxMode,
       cwd: input.session.workspace
     });
 
