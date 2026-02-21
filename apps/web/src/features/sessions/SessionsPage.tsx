@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, type MouseEvent } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -27,6 +27,7 @@ export function SessionsPage() {
   const [guardError, setGuardError] = useState<string | null>(null);
   const isMobile = useMediaQuery("(max-width: 720px)");
   const [sessionsDrawerOpen, setSessionsDrawerOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useRunEvents();
 
@@ -183,6 +184,7 @@ export function SessionsPage() {
   useEffect(() => {
     if (!isMobile) {
       setSessionsDrawerOpen(true);
+      setMobileMenuOpen(false);
     }
   }, [isMobile]);
 
@@ -191,6 +193,23 @@ export function SessionsPage() {
       setSessionsDrawerOpen(true);
     }
   }, [isMobile, params.sessionId]);
+
+  useEffect(() => {
+    if (!isMobile || !mobileMenuOpen) {
+      return;
+    }
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [isMobile, mobileMenuOpen]);
 
   const requestError = [
     sessionsQuery.error,
@@ -211,31 +230,77 @@ export function SessionsPage() {
   const errorMessage = guardError ?? requestError;
   const codexAuthRequired = Boolean(codex.accountStatus?.requiresOpenaiAuth && !codex.accountStatus?.account);
   const shouldShowCodexPanel = codex.pendingLogin || codexAuthRequired || Boolean(codex.message);
+  const closeMobileMenu = () => {
+    setMobileMenuOpen(false);
+  };
+  const onMobileMenuPanelClick = (event: MouseEvent<HTMLDivElement>) => {
+    event.stopPropagation();
+  };
+  const topbarActions = (
+    <>
+      <span className="codex-status">{codex.statusLabel}</span>
+      <button
+        type="button"
+        className="secondary-button"
+        onClick={() => {
+          setSettingsOpen(true);
+          closeMobileMenu();
+        }}
+      >
+        Agent
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          closeMobileMenu();
+          void auth.logout();
+          navigate("/login", { replace: true });
+        }}
+      >
+        Logout
+      </button>
+    </>
+  );
 
   return (
     <main className="dashboard-shell">
       <header className="topbar">
-        <div>
+        <div className="topbar-brand">
           <p className="eyebrow">Bob</p>
         </div>
 
-        <div className="topbar-actions">
-          <span className="codex-status">{codex.statusLabel}</span>
-          <button type="button" className="secondary-button" onClick={() => setSettingsOpen(true)}>
-            Agent
-          </button>
+        {isMobile ? (
           <button
             type="button"
-            onClick={() => {
-              void auth.logout();
-              navigate("/login", { replace: true });
-            }}
+            className="secondary-button topbar-menu-button"
+            onClick={() => setMobileMenuOpen((current) => !current)}
+            aria-expanded={mobileMenuOpen}
+            aria-controls="mobile-topbar-menu-panel"
+            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
           >
-            Logout
+            <span aria-hidden="true" className="topbar-menu-glyph">
+              {mobileMenuOpen ? "✕" : "☰"}
+            </span>
+            <span>Menu</span>
           </button>
-        </div>
-
+        ) : (
+          <div className="topbar-actions">{topbarActions}</div>
+        )}
       </header>
+      {isMobile && mobileMenuOpen ? (
+        <div id="mobile-topbar-menu" className="topbar-mobile-menu-modal" onClick={closeMobileMenu}>
+          <div
+            id="mobile-topbar-menu-panel"
+            className="topbar-mobile-menu"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Header menu"
+            onClick={onMobileMenuPanelClick}
+          >
+            {topbarActions}
+          </div>
+        </div>
+      ) : null}
 
       {errorMessage ? <p className="form-error wide">{errorMessage}</p> : null}
 

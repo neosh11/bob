@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import type { Message, RunStatus } from "../types";
 
@@ -7,12 +7,21 @@ interface MessageThreadProps {
   runStatuses?: Record<string, RunStatus>;
 }
 
-function renderMessageContent(message: Message): string {
+const AUTO_SCROLL_THRESHOLD_PX = 120;
+
+function isNearBottom(element: HTMLElement): boolean {
+  return element.scrollHeight - element.scrollTop - element.clientHeight <= AUTO_SCROLL_THRESHOLD_PX;
+}
+
+function renderMessageContent(message: Message, runStatus?: RunStatus): string {
   if (message.content.trim().length > 0) {
     return message.content;
   }
 
   if (message.role === "assistant") {
+    if (runStatus === "queued" || runStatus === "running") {
+      return "Waiting for first token...";
+    }
     return "No response text returned for this run.";
   }
 
@@ -30,6 +39,28 @@ function renderPreview(content: string): string {
 
 export function MessageThread({ messages, runStatuses = {} }: MessageThreadProps) {
   const [expandedMessages, setExpandedMessages] = useState<Record<string, boolean>>({});
+  const threadRef = useRef<HTMLDivElement | null>(null);
+  const autoScrollEnabledRef = useRef(true);
+  const sessionId = messages[0]?.sessionId ?? null;
+
+  useEffect(() => {
+    autoScrollEnabledRef.current = true;
+  }, [sessionId]);
+
+  useLayoutEffect(() => {
+    const thread = threadRef.current;
+    if (!thread || !autoScrollEnabledRef.current) {
+      return;
+    }
+
+    const frame = requestAnimationFrame(() => {
+      thread.scrollTop = thread.scrollHeight;
+    });
+
+    return () => {
+      cancelAnimationFrame(frame);
+    };
+  }, [messages, runStatuses]);
 
   const toggleExpanded = (id: string) => {
     setExpandedMessages((prev) => ({
@@ -46,24 +77,36 @@ export function MessageThread({ messages, runStatuses = {} }: MessageThreadProps
         const isSystem = message.role === "system";
         const isExpanded = expandedMessages[message.id] ?? false;
         const isPendingAssistant = isAssistant && (runStatus === "queued" || runStatus === "running");
-        const content = renderMessageContent(message);
+        const content = renderMessageContent(message, runStatus);
+        const shouldShowToggle = !isPendingAssistant && (isAssistant || isSystem);
+        const shouldCollapse = shouldShowToggle && !isExpanded;
 
         return {
           message,
-          runStatus,
           isAssistant,
-          isSystem,
           isExpanded,
           isPendingAssistant,
-          content
+          content,
+          shouldShowToggle,
+          shouldCollapse
         };
       }),
     [expandedMessages, messages, runStatuses]
   );
 
   return (
-    <div className="message-thread">
-      {computedMessages.map(({ message, isAssistant, isSystem, isExpanded, isPendingAssistant, content }) => (
+    <div
+      className="message-thread"
+      ref={threadRef}
+      onScroll={() => {
+        const thread = threadRef.current;
+        if (!thread) {
+          return;
+        }
+        autoScrollEnabledRef.current = isNearBottom(thread);
+      }}
+    >
+      {computedMessages.map(({ message, isAssistant, isExpanded, isPendingAssistant, content, shouldShowToggle, shouldCollapse }) => (
         <article
           key={message.id}
           className={`message message-${message.role}${isPendingAssistant ? " message-pending" : ""}`}
@@ -90,7 +133,7 @@ export function MessageThread({ messages, runStatuses = {} }: MessageThreadProps
               </div>
             ) : null}
 
-            {!isPendingAssistant && (isAssistant || isSystem) ? (
+            {shouldShowToggle ? (
               <div className="message-toggle-row">
                 <button
                   type="button"
@@ -107,14 +150,9 @@ export function MessageThread({ messages, runStatuses = {} }: MessageThreadProps
               </div>
             ) : null}
 
-            {!isPendingAssistant ? (
-              <pre
-                id={`message-content-${message.id}`}
-                className={`message-contents${(isAssistant || isSystem) && !isExpanded ? " message-contents-collapsed" : ""}`}
-              >
-                {content}
-              </pre>
-            ) : null}
+            <pre id={`message-content-${message.id}`} className={`message-contents${shouldCollapse ? " message-contents-collapsed" : ""}`}>
+              {content}
+            </pre>
           </div>
         </article>
       ))}

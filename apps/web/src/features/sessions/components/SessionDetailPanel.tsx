@@ -72,7 +72,7 @@ export function SessionDetailPanel({
   return (
     <section className="detail-shell">
       <header className="detail-header">
-        <div>
+        <div className="detail-header-main">
           <p className="eyebrow">Workspace</p>
           <h2>{detail.session.title}</h2>
           <p className="workspace-path">{detail.session.workspace}</p>
@@ -83,35 +83,47 @@ export function SessionDetailPanel({
           {latestRun ? <RunStatusBadge status={latestRun.status} /> : null}
           <button
             type="button"
-            className="secondary-button"
+            className="secondary-button detail-action-button"
+            aria-label="Fork session"
             disabled={forkPending || deletePending || cancelPending}
             onClick={() => {
               void onFork();
             }}
           >
-            {forkPending ? "Forking..." : "Fork Session"}
+            <span className="detail-action-label">{forkPending ? "Forking..." : "Fork Session"}</span>
+            <span className="detail-action-icon" aria-hidden="true">
+              {forkPending ? "…" : "⑂"}
+            </span>
           </button>
           {canCancel ? (
             <button
               type="button"
-              className="cancel-run-button"
+              className="cancel-run-button detail-action-button"
+              aria-label="Cancel run"
               disabled={cancelPending}
               onClick={() => {
                 void onCancel(latestRun.id);
               }}
             >
-              {cancelPending ? "Canceling..." : "Cancel Run"}
+              <span className="detail-action-label">{cancelPending ? "Canceling..." : "Cancel Run"}</span>
+              <span className="detail-action-icon" aria-hidden="true">
+                {cancelPending ? "…" : "✕"}
+              </span>
             </button>
           ) : null}
           <button
             type="button"
-            className="delete-session-button"
+            className="delete-session-button detail-action-button"
+            aria-label="Delete session"
             disabled={deletePending || cancelPending}
             onClick={() => {
               void onDelete();
             }}
           >
-            {deletePending ? "Deleting..." : "Delete Session"}
+            <span className="detail-action-label">{deletePending ? "Deleting..." : "Delete Session"}</span>
+            <span className="detail-action-icon" aria-hidden="true">
+              {deletePending ? "…" : "⌫"}
+            </span>
           </button>
         </div>
       </header>
