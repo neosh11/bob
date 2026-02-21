@@ -30,6 +30,7 @@ export function SessionsPage() {
   const isMobile = useMediaQuery("(max-width: 720px)");
   const [sessionsDrawerOpen, setSessionsDrawerOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [selectedWorkspace, setSelectedWorkspace] = useState("");
 
   useRunEvents();
 
@@ -47,14 +48,15 @@ export function SessionsPage() {
     setSessionsDrawerOpen(false);
   }, [isMobile]);
 
-  const sessionsQuery = useQuery({
-    queryKey: sessionKeys.all,
-    queryFn: listSessions
-  });
-
   const workspacesQuery = useQuery({
     queryKey: sessionKeys.workspaces,
     queryFn: listWorkspaces
+  });
+
+  const sessionsQuery = useQuery({
+    queryKey: sessionKeys.list(selectedWorkspace || "__all__"),
+    queryFn: () => listSessions(selectedWorkspace || undefined),
+    enabled: !workspacesQuery.isPending && ((workspacesQuery.data?.workspaces.length ?? 0) === 0 || Boolean(selectedWorkspace))
   });
 
   const detailQuery = useQuery({
@@ -78,6 +80,7 @@ export function SessionsPage() {
     mutationFn: createSession,
     onSuccess: async (response) => {
       setGuardError(null);
+      setSelectedWorkspace(response.session.workspace);
       await queryClient.invalidateQueries({ queryKey: sessionKeys.all });
       navigate(`/sessions/${response.session.id}`);
       closeSessionsDrawer();
@@ -166,6 +169,7 @@ export function SessionsPage() {
       return forkSession(params.sessionId);
     },
     onSuccess: async (response) => {
+      setSelectedWorkspace(response.session.workspace);
       await queryClient.invalidateQueries({ queryKey: sessionKeys.all });
       navigate(`/sessions/${response.session.id}`);
       closeSessionsDrawer();
@@ -191,10 +195,34 @@ export function SessionsPage() {
   }, [isMobile]);
 
   useEffect(() => {
+    const workspaces = workspacesQuery.data?.workspaces ?? [];
+    const firstWorkspacePath = workspaces.at(0)?.path;
+    if (!firstWorkspacePath) {
+      return;
+    }
+
+    setSelectedWorkspace((current) => {
+      if (current && workspaces.some((workspace) => workspace.path === current)) {
+        return current;
+      }
+      return firstWorkspacePath;
+    });
+  }, [workspacesQuery.data?.workspaces]);
+
+  useEffect(() => {
     if (isMobile && !params.sessionId) {
       setSessionsDrawerOpen(true);
     }
   }, [isMobile, params.sessionId]);
+
+  useEffect(() => {
+    const activeWorkspace = detailQuery.data?.session.workspace;
+    if (!activeWorkspace) {
+      return;
+    }
+
+    setSelectedWorkspace((current) => (current === activeWorkspace ? current : activeWorkspace));
+  }, [detailQuery.data?.session.workspace]);
 
   useEffect(() => {
     if (!isMobile || !mobileMenuOpen) {
@@ -360,10 +388,12 @@ export function SessionsPage() {
             <SessionList
               sessions={sessionsQuery.data?.sessions ?? []}
               workspaces={workspacesQuery.data?.workspaces ?? []}
+              selectedWorkspace={selectedWorkspace}
               activeSessionId={params.sessionId}
               creating={createSessionMutation.isPending}
               deleting={deleteSessionMutation.isPending}
               createDisabled={codex.authBlocked}
+              onWorkspaceChange={setSelectedWorkspace}
               onSelect={(sessionId) => {
                 navigate(`/sessions/${sessionId}`);
                 closeSessionsDrawer();

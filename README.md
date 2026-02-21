@@ -1,5 +1,29 @@
 # Bob
 
+## Security First: Network Exposure
+
+Bob can execute coding tasks on the host machine. Only expose it to trusted users and networks.
+
+Default ports Bob uses:
+
+- `5173/tcp` - web UI dev server (`apps/web`, Vite dev).
+- `4000/tcp` - Bob API + Socket.IO realtime (`apps/server`).
+- `4173/tcp` - optional web preview server (`npm run preview`).
+- `8787/tcp` - Codex app-server websocket in `app-server` mode (`BOB_CODEX_APP_SERVER_LISTEN`, default `ws://127.0.0.1:8787`).
+
+Recommended firewall posture:
+
+- Allow inbound `5173/tcp` only from trusted client networks that should access the UI.
+- Allow inbound `4000/tcp` only from those same trusted client networks (the browser calls API/realtime here).
+- Block inbound `4173/tcp` unless you are actively using preview mode.
+- Keep `8787/tcp` loopback-only (`127.0.0.1`) and block inbound access from non-local hosts.
+- Default-deny all other inbound ports on the Bob host.
+
+Notes:
+
+- Bob does not open a separate inbound database port (SQLite is file-based).
+- `BOB_HOST` controls API bind address (default `0.0.0.0`), so set it deliberately for your network model.
+
 Bob is a local-first agentic coding service with a React frontend and TypeScript API backend.
 
 The app is network-accessible (`0.0.0.0`) and protected by one shared password from environment configuration.
@@ -27,7 +51,7 @@ The app is network-accessible (`0.0.0.0`) and protected by one shared password f
   - `CodexService` bridges JSON-RPC to `codex app-server`
   - `RunOrchestrator` coordinates legacy provider run lifecycle and event streaming
 - `apps/web`
-  - React + Vite app
+  - React + Vite app (React Compiler enabled via `babel-plugin-react-compiler`)
   - protected routes, auth context, session UI, realtime updates
 
 ## Getting Started
@@ -152,6 +176,7 @@ Canceled runs are marked as failed with a cancellation reason for full audit vis
 - `POST /api/auth/codex/login/cancel` cancels a pending login.
 - `POST /api/auth/codex/logout` disconnects the Codex account.
 - `DELETE /api/sessions/:sessionId` deletes the session and cascades messages/runs.
+- `GET /api/sessions?workspace=<absolute-path>` scopes session list to one configured workspace.
 
 Audit events include actor, event type, target, outcome, timestamp, and optional metadata.
 

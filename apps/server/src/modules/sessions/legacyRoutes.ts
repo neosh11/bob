@@ -15,6 +15,10 @@ const createMessageSchema = z.object({
   content: z.string().trim().min(1).max(20_000)
 });
 
+const listSessionsQuerySchema = z.object({
+  workspace: z.string().trim().min(1).optional()
+});
+
 export function createLegacySessionRoutes(context: AppContext): Router {
   const router = Router();
 
@@ -22,7 +26,16 @@ export function createLegacySessionRoutes(context: AppContext): Router {
     "/sessions",
     requireAuth,
     asyncHandler(async (req, res) => {
-      const sessions = context.repos.sessions.listByOwner(req.auth!.userId);
+      const query = listSessionsQuerySchema.parse(req.query);
+      if (query.workspace && !context.config.workspaces.some((workspace) => workspace.path === query.workspace)) {
+        res.status(400).json({ error: "Workspace is not allowed." });
+        return;
+      }
+
+      const sessions = context.repos.sessions
+        .listByOwner(req.auth!.userId)
+        .filter((session) => (query.workspace ? session.workspace === query.workspace : true));
+
       res.json({ sessions });
     })
   );

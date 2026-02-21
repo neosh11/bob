@@ -71,4 +71,39 @@ describe("auth + session flows", () => {
     const found = (list.body.sessions as Array<{ id: string }>).some((session) => session.id === sessionId);
     expect(found).toBe(false);
   });
+
+  it("filters sessions by workspace", async () => {
+    const { app } = await buildTestApp({
+      configOverrides: {
+        workspaces: [
+          { id: "ws-1", label: "alpha", path: "/tmp/alpha" },
+          { id: "ws-2", label: "beta", path: "/tmp/beta" }
+        ]
+      }
+    });
+    const client = request.agent(app);
+
+    await client
+      .post("/api/auth/login")
+      .send({ password: "super-secret-password" })
+      .expect(200);
+
+    await client
+      .post("/api/sessions")
+      .send({ title: "Alpha Session", workspace: "/tmp/alpha" })
+      .expect(201);
+
+    await client
+      .post("/api/sessions")
+      .send({ title: "Beta Session", workspace: "/tmp/beta" })
+      .expect(201);
+
+    const alpha = await client.get("/api/sessions").query({ workspace: "/tmp/alpha" }).expect(200);
+    expect((alpha.body.sessions as Array<{ workspace: string }>).every((session) => session.workspace === "/tmp/alpha")).toBe(true);
+    expect((alpha.body.sessions as Array<unknown>).length).toBe(1);
+
+    const beta = await client.get("/api/sessions").query({ workspace: "/tmp/beta" }).expect(200);
+    expect((beta.body.sessions as Array<{ workspace: string }>).every((session) => session.workspace === "/tmp/beta")).toBe(true);
+    expect((beta.body.sessions as Array<unknown>).length).toBe(1);
+  });
 });

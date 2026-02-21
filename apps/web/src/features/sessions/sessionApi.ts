@@ -22,8 +22,13 @@ interface SendMessageResponse {
   run: Run;
 }
 
-export function listSessions(): Promise<SessionsResponse> {
-  return apiRequest<SessionsResponse>("/sessions");
+export function listSessions(workspace?: string): Promise<SessionsResponse> {
+  const params = new URLSearchParams();
+  if (workspace) {
+    params.set("workspace", workspace);
+  }
+  const query = params.toString();
+  return apiRequest<SessionsResponse>(`/sessions${query ? `?${query}` : ""}`);
 }
 
 export function listWorkspaces(): Promise<WorkspacesResponse> {

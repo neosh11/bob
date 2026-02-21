@@ -1,14 +1,16 @@
-import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 
 import type { Session, Workspace } from "../types";
 
 interface SessionListProps {
   sessions: Session[];
   workspaces: Workspace[];
+  selectedWorkspace: string;
   activeSessionId?: string;
   creating: boolean;
   deleting?: boolean;
   createDisabled?: boolean;
+  onWorkspaceChange: (workspace: string) => void;
   onSelect: (sessionId: string) => void;
   onDelete: (sessionId: string) => void;
   onCreate: (input: { title: string; workspace: string }) => void;
@@ -23,10 +25,12 @@ const SWIPE_DELETE_THRESHOLD = 80;
 export function SessionList({
   sessions,
   workspaces,
+  selectedWorkspace,
   activeSessionId,
   creating,
   deleting = false,
   createDisabled = false,
+  onWorkspaceChange,
   onSelect,
   onDelete,
   onCreate,
@@ -34,27 +38,19 @@ export function SessionList({
   onCloseRequest
 }: SessionListProps) {
   const [title, setTitle] = useState("");
-  const defaultWorkspace = useMemo(() => workspaces[0]?.path ?? "", [workspaces]);
-  const [workspace, setWorkspace] = useState(defaultWorkspace);
   const [openActionsSessionId, setOpenActionsSessionId] = useState<string | null>(null);
   const [dragOffsetBySessionId, setDragOffsetBySessionId] = useState<Record<string, number>>({});
   const touchStartXRef = useRef(0);
   const touchSessionIdRef = useRef<string | null>(null);
   const didSwipeRef = useRef(false);
 
-  useEffect(() => {
-    if (defaultWorkspace && !workspace) {
-      setWorkspace(defaultWorkspace);
-    }
-  }, [defaultWorkspace, workspace]);
-
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!title.trim() || !workspace) {
+    if (!title.trim() || !selectedWorkspace) {
       return;
     }
 
-    onCreate({ title: title.trim(), workspace });
+    onCreate({ title: title.trim(), workspace: selectedWorkspace });
     setTitle("");
   };
 
@@ -133,8 +129,8 @@ export function SessionList({
 
       <form className="session-create-form" onSubmit={submit}>
         <select
-          value={workspace}
-          onChange={(event) => setWorkspace(event.target.value)}
+          value={selectedWorkspace}
+          onChange={(event) => onWorkspaceChange(event.target.value)}
           disabled={creating || createDisabled || workspaces.length === 0}
         >
           {workspaces.map((item) => (
@@ -150,7 +146,7 @@ export function SessionList({
           required
           disabled={creating || createDisabled}
         />
-        <button type="submit" disabled={creating || createDisabled || workspaces.length === 0}>
+        <button type="submit" disabled={creating || createDisabled || workspaces.length === 0 || !selectedWorkspace}>
           {creating ? "Creating..." : "New Session"}
         </button>
       </form>

@@ -63,16 +63,19 @@ Manual checks are required for:
 - Keep route handlers thin; place stateful logic in orchestrator/repositories.
 - Validate request payloads with `zod`.
 - Persist all run outputs and status transitions.
+- Keep session listing workspace-scoped (`GET /api/sessions?workspace=...`) and validate workspace against configured allowlist.
 
 ## Frontend Conventions
 
 - Keep API requests in feature-level `*Api.ts` modules.
 - Keep query keys centralized under each feature.
 - Realtime event handling should update query cache via pure helpers.
+- Keep session list queries keyed by selected workspace and keep create/list workspace selection synchronized.
 - Maintain mobile-safe layouts and avoid fixed-width overflow.
 - Keep the mobile session header as two rows: row 1 for title/actions, row 2 for workspace path with horizontal scrolling for long paths.
 - Represent run status in the header with compact dot indicators (no text pills): pulsing green for running, solid green for done, with distinct colors for queued/failed.
 - Keep assistant responses expanded by default. System/reasoning entries may be toggleable, but should render as flat gray rows with button-only toggles (no collapsed preview cards).
+- Keep React Compiler enabled in `apps/web/vite.config.ts` via `babel-plugin-react-compiler` as the first Babel plugin in the React plugin pipeline.
 - Keep PWA assets coherent (`manifest`, icons, SW registration) and validate iOS install behavior after changes.
 - Remember service workers require secure context; do not assume full offline behavior on plain LAN HTTP origins.
 - Render assistant/system rich text via markdown-safe components instead of raw HTML injection.

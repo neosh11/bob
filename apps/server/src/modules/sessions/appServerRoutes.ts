@@ -25,6 +25,10 @@ const steerRunSchema = z.object({
   content: z.string().trim().min(1).max(20_000)
 });
 
+const listSessionsQuerySchema = z.object({
+  workspace: z.string().trim().min(1).optional()
+});
+
 function requireCodex(context: AppContext) {
   if (!context.codex) {
     throw new Error("Codex app-server is not configured.");
@@ -46,6 +50,12 @@ export function createAppServerSessionRoutes(context: AppContext): Router {
     "/sessions",
     requireAuth,
     asyncHandler(async (req, res) => {
+      const query = listSessionsQuerySchema.parse(req.query);
+      if (query.workspace && !context.config.workspaces.some((workspace) => workspace.path === query.workspace)) {
+        res.status(400).json({ error: "Workspace is not allowed." });
+        return;
+      }
+
       const sessions = context.repos.sessions.listByOwner(req.auth!.userId);
       const codex = requireCodex(context);
       const threads = await codex.listThreads();
@@ -63,7 +73,8 @@ export function createAppServerSessionRoutes(context: AppContext): Router {
         };
       });
 
-      res.json({ sessions: merged });
+      const filtered = merged.filter((session) => (query.workspace ? session.workspace === query.workspace : true));
+      res.json({ sessions: filtered });
     })
   );
 

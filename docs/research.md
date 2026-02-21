@@ -31,6 +31,7 @@ Source: npm registry + npm downloads API
 | vite-plugin-pwa | 1.2.0 latest, 0.20.5 selected | 1,706,286 |
 | react-markdown | 10.1.0 | 11,348,597 |
 | remark-gfm | 4.0.1 | 11,952,454 |
+| babel-plugin-react-compiler | 1.0.0 | 4,617,594 |
 | typescript | 5.9.3 | 116,834,367 |
 
 ## Notes
@@ -47,6 +48,7 @@ Source: npm registry + npm downloads API
 - `pino` + `pino-http` added for structured request logging with low-overhead JSON logs and built-in serializer support.
 - `vite-plugin-pwa` selected as the mainstream Vite-native PWA integration for manifest generation and service worker precache with minimal custom plumbing.
 - `react-markdown` + `remark-gfm` selected to render assistant/system markdown safely (CommonMark + GFM tables/lists/checklists) without writing a custom parser.
+- `babel-plugin-react-compiler` enabled through `@vitejs/plugin-react` to adopt React Compiler optimizations in a first-party-supported Vite integration path.
 
 ## Security Design References
 
@@ -79,4 +81,5 @@ curl -s "https://registry.npmjs.org/<package>/latest"
 - [vite-plugin-pwa](https://www.npmjs.com/package/vite-plugin-pwa)
 - [react-markdown](https://www.npmjs.com/package/react-markdown)
 - [remark-gfm](https://www.npmjs.com/package/remark-gfm)
+- [babel-plugin-react-compiler](https://www.npmjs.com/package/babel-plugin-react-compiler)
 - [typescript](https://www.npmjs.com/package/typescript)

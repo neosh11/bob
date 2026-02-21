@@ -144,7 +144,7 @@ export function SessionDetailPanel({
             >
               <span className="detail-action-label">{forkPending ? "Forking..." : "Fork Session"}</span>
               <span className="detail-action-icon" aria-hidden="true">
-                {forkPending ? "…" : "+"}
+                {forkPending ? "…" : "⑂"}
               </span>
             </button>
             {canCancel ? (
