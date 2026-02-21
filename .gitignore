@@ -6,8 +6,15 @@ npm-debug.log*
 !.env.example
 apps/server/data/*.db
 apps/server/data/*.sqlite
+apps/server/data/*.sqlite-*
 apps/server/data/*.sqlite3
 apps/server/data/*.db-*
+apps/server/apps/server/data/*.db
+apps/server/apps/server/data/*.db-*
+apps/server/apps/server/data/*.sqlite
+apps/server/apps/server/data/*.sqlite-*
+apps/server/apps/server/data/*.sqlite3
+apps/server/apps/server/data/
 apps/server/dist
 apps/web/dist
 coverage
