@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState, type MouseEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -25,6 +25,8 @@ export function SessionsPage() {
   const codex = useCodexAccount();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [guardError, setGuardError] = useState<string | null>(null);
+  const [toasts, setToasts] = useState<Array<{ id: number; message: string }>>([]);
+  const lastToastedErrorRef = useRef<string | null>(null);
   const isMobile = useMediaQuery("(max-width: 720px)");
   const [sessionsDrawerOpen, setSessionsDrawerOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -236,6 +238,29 @@ export function SessionsPage() {
   const onMobileMenuPanelClick = (event: MouseEvent<HTMLDivElement>) => {
     event.stopPropagation();
   };
+
+  useEffect(() => {
+    if (!errorMessage) {
+      lastToastedErrorRef.current = null;
+      return;
+    }
+
+    if (lastToastedErrorRef.current === errorMessage) {
+      return;
+    }
+
+    const toastId = Date.now() + Math.floor(Math.random() * 1000);
+    lastToastedErrorRef.current = errorMessage;
+    setToasts((current) => [...current, { id: toastId, message: errorMessage }]);
+
+    const timeout = window.setTimeout(() => {
+      setToasts((current) => current.filter((toast) => toast.id !== toastId));
+    }, 5000);
+
+    return () => {
+      window.clearTimeout(timeout);
+    };
+  }, [errorMessage]);
   const topbarActions = (
     <>
       <span className="codex-status">{codex.statusLabel}</span>
@@ -264,29 +289,14 @@ export function SessionsPage() {
 
   return (
     <main className="dashboard-shell">
-      <header className="topbar">
-        <div className="topbar-brand">
-          <p className="eyebrow">Bob</p>
-        </div>
-
-        {isMobile ? (
-          <button
-            type="button"
-            className="secondary-button topbar-menu-button"
-            onClick={() => setMobileMenuOpen((current) => !current)}
-            aria-expanded={mobileMenuOpen}
-            aria-controls="mobile-topbar-menu-panel"
-            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
-          >
-            <span aria-hidden="true" className="topbar-menu-glyph">
-              {mobileMenuOpen ? "✕" : "☰"}
-            </span>
-            <span>Menu</span>
-          </button>
-        ) : (
+      {!isMobile ? (
+        <header className="topbar">
+          <div className="topbar-brand">
+            <p className="eyebrow">Bob</p>
+          </div>
           <div className="topbar-actions">{topbarActions}</div>
-        )}
-      </header>
+        </header>
+      ) : null}
       {isMobile && mobileMenuOpen ? (
         <div id="mobile-topbar-menu" className="topbar-mobile-menu-modal" onClick={closeMobileMenu}>
           <div
@@ -302,7 +312,15 @@ export function SessionsPage() {
         </div>
       ) : null}
 
-      {errorMessage ? <p className="form-error wide">{errorMessage}</p> : null}
+      {toasts.length > 0 ? (
+        <div className="toast-stack" role="status" aria-live="polite" aria-atomic="true">
+          {toasts.map((toast) => (
+            <div key={toast.id} className="toast toast-error">
+              {toast.message}
+            </div>
+          ))}
+        </div>
+      ) : null}
 
       {shouldShowCodexPanel ? (
         <CodexAuthPanel
@@ -411,6 +429,11 @@ export function SessionsPage() {
           }}
           showSessionListTrigger={isMobile}
           onShowSessionList={openSessionsDrawer}
+          showHeaderMenuTrigger={isMobile}
+          headerMenuOpen={mobileMenuOpen}
+          onToggleHeaderMenu={() => {
+            setMobileMenuOpen((current) => !current);
+          }}
         />
       </div>
 

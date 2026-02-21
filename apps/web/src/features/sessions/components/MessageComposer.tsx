@@ -18,7 +18,6 @@ export function MessageComposer({
   onSteer
 }: MessageComposerProps) {
   const [content, setContent] = useState("");
-  const [steerContent, setSteerContent] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const MAX_TEXTAREA_HEIGHT = 220;
 
@@ -42,14 +41,13 @@ export function MessageComposer({
     setContent("");
   };
 
-  const submitSteer = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!onSteer || !steerContent.trim() || disabled) {
+  const submitSteer = async () => {
+    if (!onSteer || !content.trim() || disabled) {
       return;
     }
 
-    await onSteer(steerContent.trim());
-    setSteerContent("");
+    await onSteer(content.trim());
+    setContent("");
   };
 
   return (
@@ -63,24 +61,24 @@ export function MessageComposer({
           ref={textareaRef}
           disabled={sending || disabled}
         />
-        <button type="submit" disabled={sending || disabled}>
-          {sending ? "Sending..." : "Run Task"}
-        </button>
-      </form>
-
-      {canSteer && onSteer ? (
-        <form className="steer-composer" onSubmit={submitSteer}>
-          <input
-            placeholder="Steer current run..."
-            value={steerContent}
-            onChange={(event) => setSteerContent(event.target.value)}
-            disabled={disabled || steering}
-          />
-          <button type="submit" className="secondary-button" disabled={disabled || steering || !steerContent.trim()}>
-            {steering ? "Steering..." : "Steer Run"}
+        <div className="message-composer-actions">
+          <button type="submit" disabled={sending || disabled}>
+            {sending ? "Sending..." : "Run Task"}
           </button>
-        </form>
-      ) : null}
+          {canSteer && onSteer ? (
+            <button
+              type="button"
+              className="secondary-button steer-action-button"
+              disabled={disabled || steering || !content.trim()}
+              onClick={() => {
+                void submitSteer();
+              }}
+            >
+              {steering ? "Steering..." : "Steer"}
+            </button>
+          ) : null}
+        </div>
+      </form>
     </div>
   );
 }

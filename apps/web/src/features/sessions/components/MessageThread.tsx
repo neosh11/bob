@@ -1,4 +1,6 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 import type { Message, RunStatus } from "../types";
 
@@ -14,37 +16,36 @@ function isNearBottom(element: HTMLElement): boolean {
 }
 
 function renderMessageContent(message: Message, runStatus?: RunStatus): string {
-  if (message.content.trim().length > 0) {
-    return message.content;
-  }
-
   if (message.role === "assistant") {
     if (runStatus === "queued" || runStatus === "running") {
-      return "Waiting for first token...";
+      return "";
+    }
+
+    if (message.content.trim().length > 0) {
+      return message.content;
     }
     return "No response text returned for this run.";
+  }
+
+  if (message.content.trim().length > 0) {
+    return message.content;
   }
 
   return "(empty)";
 }
 
-function renderPreview(content: string): string {
-  const normalized = content.replace(/\s+/g, " ").trim();
-  if (!normalized) {
-    return "(empty)";
-  }
-
-  return normalized.length > 140 ? `${normalized.slice(0, 137)}...` : normalized;
-}
-
 export function MessageThread({ messages, runStatuses = {} }: MessageThreadProps) {
-  const [expandedMessages, setExpandedMessages] = useState<Record<string, boolean>>({});
   const threadRef = useRef<HTMLDivElement | null>(null);
   const autoScrollEnabledRef = useRef(true);
+  const [activeTimestampMessageId, setActiveTimestampMessageId] = useState<string | null>(null);
   const sessionId = messages[0]?.sessionId ?? null;
 
   useEffect(() => {
     autoScrollEnabledRef.current = true;
+  }, [sessionId]);
+
+  useEffect(() => {
+    setActiveTimestampMessageId(null);
   }, [sessionId]);
 
   useLayoutEffect(() => {
@@ -62,36 +63,22 @@ export function MessageThread({ messages, runStatuses = {} }: MessageThreadProps
     };
   }, [messages, runStatuses]);
 
-  const toggleExpanded = (id: string) => {
-    setExpandedMessages((prev) => ({
-      ...prev,
-      [id]: !prev[id]
-    }));
-  };
-
   const computedMessages = useMemo(
     () =>
-      messages.map((message) => {
+      messages.filter((message) => message.role !== "system").map((message) => {
         const runStatus = message.runId ? runStatuses[message.runId] : undefined;
-        const isAssistant = message.role === "assistant";
-        const isSystem = message.role === "system";
-        const isExpanded = expandedMessages[message.id] ?? false;
-        const isPendingAssistant = isAssistant && (runStatus === "queued" || runStatus === "running");
+        const isPendingAssistant = message.role === "assistant" && (runStatus === "queued" || runStatus === "running");
         const content = renderMessageContent(message, runStatus);
-        const shouldShowToggle = !isPendingAssistant && (isAssistant || isSystem);
-        const shouldCollapse = shouldShowToggle && !isExpanded;
+        const shouldHideContent = message.role === "assistant" && isPendingAssistant;
 
         return {
           message,
-          isAssistant,
-          isExpanded,
           isPendingAssistant,
           content,
-          shouldShowToggle,
-          shouldCollapse
+          shouldHideContent
         };
       }),
-    [expandedMessages, messages, runStatuses]
+    [messages, runStatuses]
   );
 
   return (
@@ -106,23 +93,15 @@ export function MessageThread({ messages, runStatuses = {} }: MessageThreadProps
         autoScrollEnabledRef.current = isNearBottom(thread);
       }}
     >
-      {computedMessages.map(({ message, isAssistant, isExpanded, isPendingAssistant, content, shouldShowToggle, shouldCollapse }) => (
+      {computedMessages.map(({ message, isPendingAssistant, content, shouldHideContent }) => (
         <article
           key={message.id}
-          className={`message message-${message.role}${isPendingAssistant ? " message-pending" : ""}`}
+          className={`message message-${message.role}${isPendingAssistant ? " message-pending" : ""}${activeTimestampMessageId === message.id ? " message-show-meta" : ""}`}
+          onClick={() => {
+            setActiveTimestampMessageId((current) => (current === message.id ? null : message.id));
+          }}
         >
           <div className="message-meta">
-            <span className="message-role">
-              {message.role === "system"
-                ? message.systemMessageType === "plan"
-                  ? "Plan"
-                  : message.systemMessageType === "reasoning"
-                    ? "Reasoning"
-                    : "System"
-                : message.role === "assistant"
-                  ? "Assistant"
-                  : "User"}
-            </span>
             <time dateTime={message.createdAt}>{new Date(message.createdAt).toLocaleTimeString()}</time>
           </div>
           <div className="message-body">
@@ -133,26 +112,11 @@ export function MessageThread({ messages, runStatuses = {} }: MessageThreadProps
               </div>
             ) : null}
 
-            {shouldShowToggle ? (
-              <div className="message-toggle-row">
-                <button
-                  type="button"
-                  className="message-toggle"
-                  aria-expanded={isExpanded}
-                  aria-controls={`message-content-${message.id}`}
-                  onClick={() => {
-                    toggleExpanded(message.id);
-                  }}
-                >
-                  {isExpanded ? "Hide details" : isAssistant ? "Show response" : "Show reasoning"}
-                </button>
-                {isExpanded ? null : <p className="message-preview">{renderPreview(content)}</p>}
+            {!shouldHideContent ? (
+              <div id={`message-content-${message.id}`} className="message-contents">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
               </div>
             ) : null}
-
-            <pre id={`message-content-${message.id}`} className={`message-contents${shouldCollapse ? " message-contents-collapsed" : ""}`}>
-              {content}
-            </pre>
           </div>
         </article>
       ))}
