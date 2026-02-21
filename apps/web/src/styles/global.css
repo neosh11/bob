@@ -1,0 +1,977 @@
+:root {
+  --bg-main: #f6f8ef;
+  --bg-surface: rgba(255, 255, 255, 0.84);
+  --bg-card: #ffffff;
+  --bg-deep: #101916;
+  --text-primary: #18211d;
+  --text-secondary: #496157;
+  --text-on-dark: #e8f5ef;
+  --border-soft: rgba(18, 39, 30, 0.13);
+  --accent: #146c43;
+  --accent-strong: #0f5233;
+  --danger: #a32139;
+  --shadow-lg: 0 18px 48px rgba(16, 26, 22, 0.18);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Space Grotesk", sans-serif;
+  color: var(--text-primary);
+  background:
+    radial-gradient(circle at 15% 25%, rgba(97, 170, 114, 0.35), transparent 38%),
+    radial-gradient(circle at 85% 15%, rgba(174, 208, 104, 0.32), transparent 42%),
+    linear-gradient(145deg, #ecf4de 0%, #f7f3e7 46%, #f1f8f2 100%);
+}
+
+a {
+  color: var(--accent-strong);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+input,
+select,
+textarea {
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: var(--bg-card);
+}
+
+button {
+  border: 1px solid transparent;
+  border-radius: 10px;
+  padding: 10px 14px;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 120ms ease, background 120ms ease;
+}
+
+button:hover {
+  background: var(--accent-strong);
+  transform: translateY(-1px);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: default;
+  transform: none;
+}
+
+.secondary-button {
+  background: transparent;
+  color: var(--accent-strong);
+  border-color: var(--border-soft);
+}
+
+.secondary-button:hover {
+  background: rgba(20, 108, 67, 0.08);
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: "IBM Plex Mono", monospace;
+}
+
+.eyebrow {
+  font-family: "IBM Plex Mono", monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+}
+
+.page-state {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+}
+
+.auth-shell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.auth-card {
+  width: min(460px, 100%);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-soft);
+  border-radius: 22px;
+  padding: 28px;
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(6px);
+}
+
+.auth-card h1 {
+  margin-top: 10px;
+  font-size: 2rem;
+}
+
+.auth-description {
+  margin-top: 8px;
+  color: var(--text-secondary);
+}
+
+.auth-form {
+  margin-top: 22px;
+  display: grid;
+  gap: 12px;
+}
+
+.auth-form label {
+  display: grid;
+  gap: 6px;
+  color: var(--text-secondary);
+}
+
+.form-error {
+  color: var(--danger);
+  font-size: 0.95rem;
+}
+
+.form-error.wide {
+  margin-bottom: 10px;
+}
+
+.dashboard-shell {
+  padding: 18px;
+  min-height: 100vh;
+  max-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 18px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-soft);
+  border-radius: 18px;
+  backdrop-filter: blur(6px);
+}
+
+.topbar h1 {
+  margin-top: 6px;
+  font-size: 1.45rem;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.topbar-actions span {
+  font-family: "IBM Plex Mono", monospace;
+  color: var(--text-secondary);
+}
+
+.codex-status {
+  max-width: 280px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.codex-auth-panel {
+  margin-top: 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-soft);
+  border-radius: 18px;
+  padding: 14px 16px;
+  display: grid;
+  gap: 10px;
+}
+
+.codex-auth-panel.warning {
+  border-color: rgba(163, 33, 57, 0.28);
+}
+
+.codex-auth-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: start;
+}
+
+.codex-auth-header h2 {
+  margin-top: 6px;
+  font-size: 1.1rem;
+}
+
+.codex-auth-description {
+  margin-top: 6px;
+  color: var(--text-secondary);
+}
+
+.codex-auth-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.codex-auth-note {
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 18, 14, 0.44);
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  z-index: 20;
+}
+
+.settings-dialog {
+  width: min(460px, 100%);
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: 16px;
+  box-shadow: var(--shadow-lg);
+  padding: 18px;
+  display: grid;
+  gap: 12px;
+}
+
+.settings-dialog label {
+  display: grid;
+  gap: 6px;
+  color: var(--text-secondary);
+}
+
+.settings-help {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.settings-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.workspace-shell {
+  display: flex;
+  gap: 14px;
+  margin-top: 4px;
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+.session-drawer {
+  flex: 0 0 320px;
+  min-height: 0;     /* key: allow shrinking inside a flex row */
+  overflow: hidden;  /* optional: prevents content forcing size */
+  display: flex;
+}
+
+.session-drawer.mobile {
+  position: fixed;
+  inset: 18px;
+  width: min(420px, calc(100% - 36px));
+  max-width: none;
+  z-index: 30;
+}
+
+.session-drawer.mobile .session-list {
+  border-radius: 16px;
+  height: 100%;
+}
+
+.session-drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 18, 14, 0.45);
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  z-index: 25;
+}
+
+.session-drawer-overlay:focus-visible {
+  outline: 2px solid var(--accent);
+}
+
+.session-list {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-soft);
+  border-radius: 18px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  min-height: 0;
+}
+
+.session-list-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+}
+
+.session-list h2 {
+  margin-top: 6px;
+  font-size: 1.12rem;
+}
+
+.session-list-close {
+  white-space: nowrap;
+}
+
+.session-create-form {
+  display: grid;
+  gap: 8px;
+}
+
+.session-items {
+  display: grid;
+  gap: 8px;
+  padding-right: 4px;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.session-items button {
+  text-align: left;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  color: var(--text-primary);
+  display: grid;
+  gap: 5px;
+}
+
+.session-items button.active {
+  border-color: #1f8858;
+  box-shadow: inset 0 0 0 1px rgba(20, 108, 67, 0.35);
+}
+
+.session-items small {
+  color: var(--text-secondary);
+  font-family: "IBM Plex Mono", monospace;
+}
+
+.empty-hint {
+  color: var(--text-secondary);
+  padding: 10px;
+  font-size: 0.92rem;
+}
+
+.detail-shell {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-soft);
+  border-radius: 18px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  min-height: 0;
+}
+
+.detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+
+.detail-header h2 {
+  margin-top: 6px;
+}
+
+.workspace-path {
+  margin-top: 5px;
+  color: var(--text-secondary);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.82rem;
+}
+
+.detail-header-actions {
+  display: grid;
+  gap: 8px;
+  justify-items: end;
+}
+
+.session-list-toggle {
+  justify-self: flex-end;
+}
+
+.detail-shell-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.cancel-run-button {
+  background: transparent;
+  color: #7e1128;
+  border-color: rgba(163, 33, 57, 0.28);
+}
+
+.cancel-run-button:hover {
+  background: rgba(163, 33, 57, 0.08);
+}
+
+.delete-session-button {
+  background: transparent;
+  color: #7e1128;
+  border-color: rgba(163, 33, 57, 0.28);
+}
+
+.delete-session-button:hover {
+  background: rgba(163, 33, 57, 0.08);
+}
+
+.message-thread {
+  overflow-y: auto;
+  padding-right: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+  min-height: 0;
+}
+
+.message {
+  border-radius: 14px;
+  padding: 12px;
+  border: 1px solid var(--border-soft);
+  background: var(--bg-card);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.message-role {
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+}
+
+.message-body {
+  display: grid;
+  gap: 8px;
+}
+
+.message-pending {
+  border-style: dashed;
+}
+
+.message-pending-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.message-pending-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--accent);
+  animation: pulse 1.3s ease-in-out infinite;
+  display: inline-block;
+}
+
+.message-toggle-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.message-toggle {
+  justify-self: start;
+  background: transparent;
+  border-color: var(--border-soft);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  padding: 6px 10px;
+}
+
+.message-toggle:hover {
+  background: rgba(20, 108, 67, 0.08);
+}
+
+.message-preview {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.message-contents {
+  margin: 0;
+}
+
+.message-contents-collapsed {
+  max-height: 0;
+  overflow: hidden;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.4;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0.4;
+    transform: scale(0.9);
+  }
+}
+
+.message-meta {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 7px;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  font-family: "IBM Plex Mono", monospace;
+}
+
+.message-user {
+  background: #edf6f1;
+}
+
+.message-assistant {
+  background: #111b18;
+  color: var(--text-on-dark);
+}
+
+.message-assistant .message-meta {
+  color: #9db8ab;
+}
+
+.message-system {
+  border-style: dashed;
+}
+
+.message-composer {
+  margin-top: 10px;
+  display: grid;
+  gap: 10px;
+}
+
+.message-composer textarea {
+  resize: vertical;
+  min-height: 84px;
+}
+
+.run-status {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: 0.8rem;
+  font-family: "IBM Plex Mono", monospace;
+  text-transform: uppercase;
+}
+
+.run-status-queued {
+  background: rgba(67, 121, 94, 0.16);
+  color: #174a33;
+}
+
+.run-status-running {
+  background: rgba(31, 98, 188, 0.16);
+  color: #174f8a;
+}
+
+.run-status-completed {
+  background: rgba(20, 108, 67, 0.2);
+  color: #0f5233;
+}
+
+.run-status-failed {
+  background: rgba(163, 33, 57, 0.16);
+  color: #7e1128;
+}
+
+@media (max-width: 980px) {
+  .topbar-actions {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .codex-status {
+    max-width: 100%;
+  }
+
+  .codex-auth-header {
+    flex-direction: column;
+  }
+
+  .codex-auth-actions {
+    justify-content: flex-start;
+  }
+
+  .workspace-shell {
+    flex-direction: column;
+    margin-top: 10px;
+  }
+
+  .session-drawer {
+    flex: none;
+    max-width: 100%;
+  }
+
+  .session-items {
+    max-height: 220px;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-shell {
+    padding: 10px;
+  }
+
+  .topbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 12px;
+    border-radius: 14px;
+  }
+
+  .topbar h1 {
+    font-size: 1.25rem;
+  }
+
+  .topbar-actions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .topbar-actions span {
+    grid-column: 1 / -1;
+  }
+
+  .topbar-actions button {
+    width: 100%;
+  }
+
+  .codex-auth-panel {
+    padding: 12px;
+    border-radius: 14px;
+  }
+
+  .codex-auth-actions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .codex-auth-actions button {
+    width: 100%;
+  }
+
+  .workspace-shell {
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .session-list,
+  .detail-shell {
+    border-radius: 14px;
+    padding: 12px;
+  }
+
+  .session-items {
+    max-height: 180px;
+  }
+
+  .detail-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .detail-header > div:last-child {
+    display: flex;
+    flex-wrap: wrap;
+    justify-items: unset;
+    justify-content: flex-start;
+    gap: 8px;
+  }
+
+  .message-thread {
+    max-height: 48vh;
+    padding-right: 0;
+  }
+
+  .message {
+    padding: 10px;
+  }
+
+  .message-meta {
+    flex-wrap: wrap;
+    gap: 6px;
+    font-size: 0.72rem;
+  }
+
+  .message-composer textarea {
+    min-height: 72px;
+  }
+}
+
+@media (max-width: 480px) {
+  .session-drawer.mobile {
+    inset: 10px;
+    width: calc(100% - 20px);
+  }
+
+  .auth-shell {
+    padding: 12px;
+  }
+
+  .auth-card {
+    border-radius: 16px;
+    padding: 18px;
+  }
+
+  .auth-card h1 {
+    font-size: 1.55rem;
+  }
+
+  .dashboard-shell {
+    padding: 8px;
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+  }
+
+  .topbar {
+    padding: 10px;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+
+/* Codex-style dark workspace skin */
+:root {
+  --bg-main: #0a0d12;
+  --bg-surface: #0f141b;
+  --bg-card: #141a22;
+  --bg-deep: #070a0f;
+  --text-primary: #e6edf3;
+  --text-secondary: #9aa7b5;
+  --text-on-dark: #e8eef5;
+  --border-soft: rgba(152, 171, 193, 0.18);
+  --accent: #2f7df6;
+  --accent-strong: #5a97f8;
+  --danger: #f16969;
+  --shadow-lg: 0 18px 48px rgba(0, 0, 0, 0.45);
+}
+
+body {
+  color: var(--text-primary);
+  background:
+    radial-gradient(circle at 8% 6%, rgba(56, 72, 95, 0.38), transparent 32%),
+    radial-gradient(circle at 92% 12%, rgba(39, 63, 91, 0.35), transparent 34%),
+    linear-gradient(180deg, #0a0d12 0%, #070a0f 100%);
+}
+
+a {
+  color: #7fb0ff;
+}
+
+input,
+select,
+textarea {
+  border-color: rgba(140, 165, 196, 0.22);
+  color: var(--text-primary);
+  background: #111720;
+}
+
+button {
+  background: #2368cf;
+}
+
+button:hover {
+  background: #3d7ee0;
+}
+
+.secondary-button {
+  color: #c0d6f8;
+  border-color: rgba(129, 156, 189, 0.28);
+}
+
+.secondary-button:hover {
+  background: rgba(67, 98, 136, 0.24);
+}
+
+.dashboard-shell {
+  gap: 10px;
+  padding: 10px;
+}
+
+.topbar {
+  background: rgba(13, 18, 25, 0.92);
+  border-color: rgba(96, 123, 160, 0.2);
+}
+
+.codex-auth-panel {
+  background: rgba(14, 20, 28, 0.9);
+  border-color: rgba(91, 124, 168, 0.2);
+}
+
+
+.session-drawer {
+  flex: 0 0 300px;
+}
+
+.session-list {
+  background: rgba(10, 15, 22, 0.96);
+  border-color: rgba(91, 124, 168, 0.18);
+}
+
+.session-items button {
+  border-color: rgba(97, 126, 160, 0.2);
+  background: rgba(23, 30, 40, 0.76);
+  color: var(--text-primary);
+}
+
+.session-items button.active {
+  border-color: rgba(67, 133, 228, 0.7);
+  box-shadow: inset 0 0 0 1px rgba(67, 133, 228, 0.35);
+  background: rgba(35, 52, 75, 0.7);
+}
+
+.detail-shell {
+  background: rgba(12, 17, 24, 0.95);
+  border-color: rgba(91, 124, 168, 0.2);
+}
+
+.run-status-running {
+  background: rgba(61, 126, 224, 0.22);
+  color: #92baf8;
+}
+
+.run-status-completed {
+  background: rgba(53, 139, 105, 0.2);
+  color: #89d4b3;
+}
+
+.run-status-failed {
+  background: rgba(241, 105, 105, 0.16);
+  color: #f3a5a5;
+}
+
+.message {
+  background: rgba(20, 27, 36, 0.9);
+  border-color: rgba(91, 124, 168, 0.2);
+}
+
+.message-user {
+  background: rgba(37, 55, 78, 0.72);
+}
+
+.message-assistant {
+  background: rgba(17, 27, 39, 0.96);
+}
+
+.message-system {
+  background: rgba(19, 23, 30, 0.92);
+}
+
+.message-preview,
+.message-pending-indicator,
+.workspace-path,
+.empty-hint,
+.settings-help {
+  color: var(--text-secondary);
+}
+
+.message-toggle {
+  color: #a9c6f2;
+  border-color: rgba(105, 133, 170, 0.28);
+}
+
+.message-toggle:hover {
+  background: rgba(46, 69, 98, 0.28);
+}
+
+.message-run-form {
+  display: grid;
+  gap: 10px;
+}
+
+.steer-composer {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.steer-composer input {
+  min-width: 0;
+}
+
+.steer-composer button {
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+
+  .session-drawer.mobile {
+    inset: 10px;
+    width: min(420px, calc(100% - 20px));
+  }
+
+  .steer-composer {
+    grid-template-columns: 1fr;
+  }
+}

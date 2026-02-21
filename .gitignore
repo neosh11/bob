@@ -1,0 +1,13 @@
+node_modules
+npm-debug.log*
+.DS_Store
+.env
+.env.*
+!.env.example
+apps/server/data/*.db
+apps/server/data/*.sqlite
+apps/server/data/*.sqlite3
+apps/server/data/*.db-*
+apps/server/dist
+apps/web/dist
+coverage

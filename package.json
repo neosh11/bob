@@ -1,0 +1,21 @@
+{
+  "name": "bob",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/server",
+    "apps/web"
+  ],
+  "scripts": {
+    "dev": "concurrently -n server,web -c cyan,magenta \"npm run dev -w @bob/server\" \"npm run dev -w @bob/web\"",
+    "dev:server": "npm run dev -w @bob/server",
+    "dev:web": "npm run dev -w @bob/web",
+    "build": "npm run build -w @bob/server && npm run build -w @bob/web",
+    "typecheck": "npm run typecheck -w @bob/server && npm run typecheck -w @bob/web",
+    "test": "npm run test -w @bob/server",
+    "lint": "npm run lint -w @bob/server && npm run lint -w @bob/web"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
