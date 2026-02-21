@@ -10,5 +10,9 @@ const STATUS_LABELS: Record<RunStatus, string> = {
 export function RunStatusBadge({ status }: { status: RunStatus }) {
   const label = STATUS_LABELS[status];
 
-  return <span className={`run-status run-status-${status}`} role="status" aria-label={`Run ${label}`} title={`Run ${label}`} />;
+  return (
+    <span className="run-status-badge detail-action-button" role="status" aria-label={`Run ${label}`} title={`Run ${label}`}>
+      <span className={`run-status run-status-${status}`} />
+    </span>
+  );
 }

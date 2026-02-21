@@ -121,6 +121,7 @@ export function SessionDetailPanel({
   const latestRun = detail.runs[0];
   const canCancel = latestRun && (latestRun.status === "queued" || latestRun.status === "running");
   const canSteer = latestRun?.status === "running";
+  const queueMode = latestRun?.status === "queued" || latestRun?.status === "running";
   const runStatuses = Object.fromEntries(detail.runs.map((run) => [run.id, run.status])) as Record<string, RunStatus>;
 
   return (
@@ -190,6 +191,7 @@ export function SessionDetailPanel({
         sending={sendPending}
         steering={steerPending}
         canSteer={canSteer}
+        queueMode={queueMode}
         disabled={sendDisabled}
         onSend={onSend}
         onSteer={onSteer}

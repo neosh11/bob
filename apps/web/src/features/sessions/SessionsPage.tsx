@@ -362,10 +362,21 @@ export function SessionsPage() {
               workspaces={workspacesQuery.data?.workspaces ?? []}
               activeSessionId={params.sessionId}
               creating={createSessionMutation.isPending}
+              deleting={deleteSessionMutation.isPending}
               createDisabled={codex.authBlocked}
               onSelect={(sessionId) => {
                 navigate(`/sessions/${sessionId}`);
                 closeSessionsDrawer();
+              }}
+              onDelete={(sessionId) => {
+                const targetSession = sessionsQuery.data?.sessions.find((session) => session.id === sessionId);
+                const label = targetSession?.title ?? "this session";
+                const confirmed = window.confirm(`Delete session "${label}"? This removes all runs and messages.`);
+                if (!confirmed) {
+                  return;
+                }
+
+                void deleteSessionMutation.mutateAsync(sessionId);
               }}
               onCreate={(input) => {
                 if (codex.authBlocked) {

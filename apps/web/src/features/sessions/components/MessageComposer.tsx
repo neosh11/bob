@@ -4,6 +4,7 @@ interface MessageComposerProps {
   sending: boolean;
   steering?: boolean;
   canSteer?: boolean;
+  queueMode?: boolean;
   disabled?: boolean;
   onSend: (content: string) => Promise<void>;
   onSteer?: (content: string) => Promise<void>;
@@ -13,6 +14,7 @@ export function MessageComposer({
   sending,
   steering = false,
   canSteer = false,
+  queueMode = false,
   disabled = false,
   onSend,
   onSteer
@@ -63,7 +65,7 @@ export function MessageComposer({
         />
         <div className="message-composer-actions">
           <button type="submit" disabled={sending || disabled}>
-            {sending ? "Sending..." : "Run Task"}
+            {sending ? (queueMode ? "Queueing..." : "Sending...") : queueMode ? "Queue Task" : "Run Task"}
           </button>
           {canSteer && onSteer ? (
             <button
