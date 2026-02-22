@@ -9,6 +9,7 @@ apps/server/data/*.sqlite
 apps/server/data/*.sqlite-*
 apps/server/data/*.sqlite3
 apps/server/data/*.db-*
+apps/server/data/config/
 apps/server/apps/server/data/*.db
 apps/server/apps/server/data/*.db-*
 apps/server/apps/server/data/*.sqlite
