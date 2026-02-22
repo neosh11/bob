@@ -24,6 +24,12 @@ Notes:
 - Bob does not open a separate inbound database port (SQLite is file-based).
 - `BOB_HOST` controls API bind address (default `0.0.0.0`), so set it deliberately for your network model.
 
+## macOS + Tailnet Setup
+
+Use the dedicated hardening playbook for Mac + iPhone setup, PF firewall policy, and validation commands:
+
+- [`docs/macos-tailnet-hardening.md`](docs/macos-tailnet-hardening.md)
+
 Bob is a local-first agentic coding service with a React frontend and TypeScript API backend.
 
 The app is network-accessible (`0.0.0.0`) and protected by one shared password from environment configuration.
@@ -162,6 +168,7 @@ Canceled runs are marked as failed with a cancellation reason for full audit vis
 
 - `BOB_WEB_ORIGIN` sets the default exact allowed frontend origin.
 - `BOB_WEB_ORIGIN_HOST_PREFIXES` optionally enables hostname-prefix matching.
+- Numeric prefixes (for example `100`) are treated as IPv4-only prefixes and will not match domain names.
 - When `BOB_WEB_ORIGIN_HOST_PREFIXES` is set, only origins whose host starts with one of the prefixes are allowed.
   - Example: `BOB_WEB_ORIGIN_HOST_PREFIXES=100*` allows `http://100.x.x.x:5173` and blocks `http://192.168.x.x:5173`.
 

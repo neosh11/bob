@@ -56,6 +56,7 @@ describe("cors origin policy", () => {
     });
 
     expect(isCorsOriginAllowed("http://100.112.182.79:5173", config)).toBe(true);
+    expect(isCorsOriginAllowed("http://100evil.example:5173", config)).toBe(false);
     expect(isCorsOriginAllowed("http://localhost:5173", config)).toBe(false);
     expect(isCorsOriginAllowed("http://192.168.1.17:5173", config)).toBe(false);
   });

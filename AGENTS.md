@@ -28,6 +28,7 @@
 - Shared password is configured via `BOB_SHARED_PASSWORD`; do not add account-creation flows.
 - When `BOB_SESSIONS_BACKEND=app-server`, Codex account auth must go through the in-app ChatGPT connect flow (`/api/auth/codex/*`) and no separate user-account system should be introduced.
 - CORS policy may be exact-origin or hostname-prefix based (`BOB_WEB_ORIGIN_HOST_PREFIXES`); preserve fail-closed behavior.
+- Numeric CORS host prefixes must be treated as IPv4-only matches to avoid accepting attacker-controlled domain names that share a numeric prefix.
 - Agent model controls are runtime-configurable via `/api/agent/settings`; keep validation strict and fail-closed.
 - All protected API routes must use `requireAuth`.
 - Workspace execution must remain restricted to configured `BOB_WORKSPACES`.
@@ -92,3 +93,4 @@ When behavior changes:
 - update `README.md` setup or usage notes
 - update this `AGENTS.md` if workflow expectations changed
 - update `docs/research.md` if dependency choices changed
+- update `docs/macos-tailnet-hardening.md` when network/firewall setup guidance changes
